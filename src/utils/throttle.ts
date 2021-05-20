@@ -1,21 +1,18 @@
-export const throttle = <T extends any[]>(
-  fn: (...params: T) => unknown,
-  wait: number,
-): ((...args: T) => void) => {
+export const throttle = (fn: (...params: unknown[]) => unknown, wait: number) => {
   let previouslyRun: number;
-  let queuedToRun: number | undefined;
+  let queuedToRun: NodeJS.Timeout;
 
-  return function invokeFn(...args: T) {
+  return function invokeFn(...args: unknown[]) {
     const now = Date.now();
 
     clearTimeout(queuedToRun);
     queuedToRun = undefined;
 
     if (!previouslyRun || now - previouslyRun >= wait) {
-      fn(...args);
+      fn.apply(null, args);
       previouslyRun = now;
     } else {
-      queuedToRun = window.setTimeout(() => invokeFn(...args), wait - (now - previouslyRun));
+      queuedToRun = setTimeout(invokeFn.bind(null, ...args), wait - (now - previouslyRun));
     }
   };
 };

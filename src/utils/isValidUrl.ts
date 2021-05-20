@@ -3,7 +3,7 @@
  *
  * @param url {string} - Url to validate
  */
-export function isValidUrl(url: string): boolean {
+export function isValidUrl(url: string) {
   try {
     new URL(url);
     return true;

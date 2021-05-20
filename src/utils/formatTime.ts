@@ -1,3 +1,3 @@
-export function formatMs(ms: number): string {
+export function formatMs(ms: number) {
   return `${ms}ms`;
 }

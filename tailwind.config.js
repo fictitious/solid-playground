@@ -4,7 +4,6 @@ module.exports = {
   mode: 'jit',
   purge: [
     "./src/**/*.{tsx,ts,css}",
-    "./playground/**/*.{tsx,ts,css}",
     "./index.html"
   ],
   theme: {

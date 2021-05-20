@@ -3,20 +3,15 @@ import { Icon } from '@amoutonbrady/solid-heroicons';
 import { share, link, upload } from '@amoutonbrady/solid-heroicons/outline';
 
 import pkg from '../../package.json';
-import logo from '../assets/logo.svg?url';
-import { processImport, Tab } from '../../src';
+import logo from '../assets/images/logo.svg?url';
+import { useStore } from '../store';
 import { exportToCsb } from '../utils/exportToCsb';
 import { exportToJSON } from '../utils/exportToJson';
+import { processImport } from '../utils/processImport';
 
-export const Header: Component<{
-  dark: boolean;
-  toggleDark: () => void;
-  isHorizontal: boolean;
-  tabs: Tab[];
-  setTabs: (tabs: Tab[]) => void;
-  setCurrent: (tabId: string) => void;
-}> = (props) => {
+export const Header: Component = () => {
   const [copy, setCopy] = createSignal(false);
+  const [store, { set }] = useStore();
 
   function shareLink() {
     const url = location.href;
@@ -36,17 +31,16 @@ export const Header: Component<{
   }
 
   const uploadFile: JSX.EventHandler<HTMLInputElement, Event> = async (event) => {
-    const [file] = event.currentTarget.files!;
+    const [file] = event.currentTarget.files;
 
     const tabs = processImport(JSON.parse(await file.text()));
-    props.setTabs(tabs);
-    props.setCurrent('main.tsx');
+    set({ tabs, current: tabs[0].id, currentCode: tabs[0].source });
   };
 
   return (
     <header
       class="p-2 flex text-sm justify-between items-center bg-brand-default text-white"
-      classList={{ 'md:col-span-3': !props.isHorizontal }}
+      classList={{ 'md:col-span-3': !store.isHorizontal }}
     >
       <h1 class="flex items-center space-x-4 uppercase leading-0 tracking-widest">
         <a href="https://github.com/ryansolid/solid">
@@ -58,14 +52,14 @@ export const Header: Component<{
       <div class="flex items-center space-x-2">
         <button
           type="button"
-          onClick={props.toggleDark}
+          onClick={() => set('dark', !store.dark)}
           class="px-3 py-2 focus:outline-none focus:ring-1 rounded text-white opacity-80 hover:opacity-100"
           title="Toggle dark mode"
         >
-          <span class="sr-only">{props.dark ? 'Light' : 'Dark'} mode</span>
+          <span class="sr-only">{store.dark ? 'Light' : 'Dark'} mode</span>
 
           <Show
-            when={props.dark}
+            when={store.dark}
             fallback={
               <svg class="h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
@@ -99,7 +93,7 @@ export const Header: Component<{
 
         <button
           type="button"
-          onClick={() => exportToJSON(props.tabs)}
+          onClick={() => exportToJSON(store.tabs)}
           class="px-3 py-2 focus:outline-none focus:ring-1 rounded text-white opacity-80 hover:opacity-100"
           title="Export to JSON"
         >
@@ -111,7 +105,7 @@ export const Header: Component<{
 
         <button
           type="button"
-          onClick={() => exportToCsb(props.tabs)}
+          onClick={() => exportToCsb(store.tabs)}
           class="px-3 py-2 focus:outline-none focus:ring-1 rounded text-white opacity-80 hover:opacity-100"
           title="Export to CodeSandbox"
         >

@@ -30,9 +30,11 @@ export const Preview: Component<Props> = (props) => {
     setIframeReady(true);
 
     iframe.contentWindow!.addEventListener('message', ({ data }) => {
-      if (data.event === 'LOG') {
-        const { level, args } = data;
-        setLogs([...logs(), { level, args }]);
+      switch (data.event) {
+        case 'LOG':
+          const { level, args } = data;
+          setLogs([...logs(), { level, args }]);
+          break;
       }
     });
   }
@@ -222,7 +224,7 @@ export const Preview: Component<Props> = (props) => {
   );
 };
 
-interface Props extends JSX.HTMLAttributes<HTMLDivElement> {
+interface Props extends JSX.HTMLAttributes<HTMLIFrameElement> {
   code: string;
 }
 

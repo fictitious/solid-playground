@@ -5,6 +5,7 @@ import {
   JSX,
   Show,
   createSignal,
+  createMemo,
   onCleanup,
   mergeProps,
 } from 'solid-js';
@@ -23,8 +24,7 @@ const Editor: Component<Props> = (props) => {
 
   let parent!: HTMLDivElement;
   let editor: mEditor.IStandaloneCodeEditor;
-
-  const model = () => mEditor.getModel(Uri.parse(finalProps.url));
+  let model = createMemo(() => mEditor.getModel(Uri.parse(finalProps.url)));
 
   const [format, setFormat] = createSignal(false);
   function formatCode() {
@@ -48,13 +48,13 @@ const Editor: Component<Props> = (props) => {
   if (finalProps.formatter) {
     languages.registerDocumentFormattingEditProvider('typescript', {
       provideDocumentFormattingEdits: async (model) => {
-        finalProps.formatter!.postMessage({
+        finalProps.formatter.postMessage({
           event: 'FORMAT',
           code: model.getValue(),
           pos: editor.getPosition(),
         });
         return new Promise((resolve, reject) => {
-          finalProps.formatter!.addEventListener(
+          finalProps.formatter.addEventListener(
             'message',
             ({ data: { event, code } }) => {
               switch (event) {
@@ -77,11 +77,13 @@ const Editor: Component<Props> = (props) => {
     });
   }
 
-  const setupEditor = () => {
+  // Initialize CodeMirror
+  onMount(() => {
     editor = mEditor.create(parent, {
       model: null,
       automaticLayout: true,
       readOnly: finalProps.disabled,
+      language: model().getModeId(),
       fontSize: 15,
       lineDecorationsWidth: 5,
       lineNumbersMinChars: 3,
@@ -90,33 +92,19 @@ const Editor: Component<Props> = (props) => {
         enabled: finalProps.withMinimap,
       },
     });
+
+    liftOff(editor);
+
     editor.onDidChangeModelContent(() => {
-      if (finalProps.onDocChange) finalProps.onDocChange(editor.getValue());
+      if (finalProps.onDocChange) props.onDocChange(editor.getValue());
     });
-  };
-  // Initialize Monaco
-  onMount(() => {
-    if (model() === null) {
-      const modelListener = mEditor.onDidCreateModel((model) => {
-        if (model.uri.toString() === finalProps.url) {
-          setupEditor();
-          updateModel();
-          modelListener.dispose();
-        }
-      });
-    } else {
-      setupEditor();
-    }
   });
   onCleanup(() => editor.dispose());
 
-  const updateModel = () => {
-    if (editor !== undefined && model() !== undefined) {
-      editor.setModel(model());
-      liftOff(editor);
-    }
-  };
-  createEffect(updateModel);
+  createEffect(() => {
+    editor.setModel(model());
+  });
+
   createEffect(() => {
     mEditor.setTheme(finalProps.isDark ? 'vs-dark-plus' : 'vs-light-plus');
   });

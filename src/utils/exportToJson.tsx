@@ -1,4 +1,4 @@
-import { Tab } from '../../src';
+import { Tab } from '../store';
 
 /**
  * This function will convert the tabs of the playground
@@ -8,11 +8,16 @@ import { Tab } from '../../src';
  *
  * @param tabs {Tab[]} - The tabs to export
  */
-export function exportToJSON(tabs: Tab[]): void {
-  const files = tabs.map<{ name: string; content: string }>((tab) => ({
-    name: tab.name,
-    content: tab.source,
-  }));
+export function exportToJSON(tabs: Tab[]) {
+  const files = tabs.reduce((json, tab) => {
+    return [
+      ...json,
+      {
+        name: tab.name,
+        content: tab.source,
+      },
+    ];
+  }, []);
 
   const blob = new Blob([JSON.stringify({ files }, null, 4)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);

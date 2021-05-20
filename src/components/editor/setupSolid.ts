@@ -1,4 +1,7 @@
 import { Uri, languages, editor } from 'monaco-editor';
+import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
+import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
+import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
 import vsDark from './vs_dark_good.json';
 import vsLight from './vs_light_good.json';
 import { loadWASM } from 'onigasm';
@@ -30,8 +33,8 @@ import sServerMock from '/node_modules/solid-js/web/types/server-mock.d.ts?raw';
 import sJsxRuntime from '/node_modules/solid-js/jsx-runtime.d.ts?raw';
 
 // Tell monaco about the file from solid-js
-function cm(source: string, path: string) {
-  editor.createModel(source, 'typescript', Uri.parse(`file:///node_modules/solid-js/${path}`));
+function cm(a: string, b: string) {
+  editor.createModel(a, 'typescript', Uri.parse(`file:///node_modules/solid-js/${b}`));
 }
 
 cm(sPackageJson, 'package.json');
@@ -56,10 +59,23 @@ cm(sWebJsx, 'web/types/jsx.d.ts');
 cm(sServerMock, 'web/types/server-mock.d.ts');
 cm(sJsxRuntime, 'jsx-runtime.d.ts');
 
+(window as any).MonacoEnvironment = {
+  getWorker: function (moduleId, label: string) {
+    switch (label) {
+      case 'css':
+        return new cssWorker();
+      case 'typescript':
+      case 'javascript':
+        return new tsWorker();
+      default:
+        return new editorWorker();
+    }
+  },
+};
+
 languages.typescript.typescriptDefaults.setCompilerOptions({
-  lib: ['es6', 'DOM', 'DOM.Iterable'],
+  lib: ['es6', 'DOM', 'dom.iterable'],
   target: languages.typescript.ScriptTarget.ESNext,
-  module: languages.typescript.ModuleKind.ESNext,
   moduleResolution: languages.typescript.ModuleResolutionKind.NodeJs,
   jsx: languages.typescript.JsxEmit.Preserve,
   jsxImportSource: 'solid-js',
@@ -72,7 +88,7 @@ const registry = new Registry({
   async getGrammarDefinition(scopeName) {
     return {
       format: 'json',
-      content: scopeName === 'source.tsx' ? typescriptReactTM : cssTM,
+      content: scopeName == 'source.tsx' ? typescriptReactTM : cssTM,
     };
   },
 });
@@ -86,7 +102,7 @@ grammars.set('css', 'source.css');
 editor.defineTheme('vs-dark-plus', vsDark as editor.IStandaloneThemeData);
 editor.defineTheme('vs-light-plus', vsLight as editor.IStandaloneThemeData);
 
-export async function liftOff(editor: editor.ICodeEditor): Promise<void> {
+export async function liftOff(editor: editor.ICodeEditor) {
   await loadingWasm;
   // wireTmGrammars only cares about the language part, but asks for all of monaco
   // we fool it by just passing in an object with languages
