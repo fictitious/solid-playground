@@ -30,6 +30,7 @@ export const Repl: typeof ReplProps = (props) => {
   // this is bad style don't do this
   const { compiler, formatter } = props;
   let now: number;
+  const container = props.container ?? document.body;
 
   const tabRefs = new Map<string, HTMLSpanElement>();
 
@@ -206,7 +207,7 @@ export const Repl: typeof ReplProps = (props) => {
   const changeLeft = (clientX: number, _clientY: number) => {
     // Adjust the reading according to the width of the resizable panes
     const clientXAdjusted = clientX - horizontalResizer()!.offsetWidth / 2;
-    const widthAdjusted = document.body.offsetWidth - horizontalResizer()!.offsetWidth;
+    const widthAdjusted = container.offsetWidth - horizontalResizer()!.offsetWidth;
 
     const percentage = clientXAdjusted / (widthAdjusted / 2);
     const percentageAdjusted = adjustPercentage(percentage, 0.5, 1.5);
@@ -225,11 +226,11 @@ export const Repl: typeof ReplProps = (props) => {
 
   const changeTop = (_clientX: number, clientY: number) => {
     // Adjust the reading according to the height of the resizable panes
-    const headerSize = document.body.offsetHeight - grid()!.offsetHeight;
+    const headerSize = container.offsetHeight - grid()!.offsetHeight;
     const clientYAdjusted =
       clientY - headerSize - fileTabs()!.offsetHeight - verticalResizer()!.offsetHeight / 2;
     const heightAdjusted =
-      document.body.offsetHeight -
+      container.offsetHeight -
       headerSize -
       fileTabs()!.offsetHeight -
       verticalResizer()!.offsetHeight -

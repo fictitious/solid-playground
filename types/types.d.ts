@@ -2,6 +2,7 @@ import { Component } from 'solid-js';
 import { editor as mEditor } from 'monaco-editor';
 
 export declare const Repl: Component<{
+  container?: HTMLElement;
   compiler: Worker;
   formatter?: Worker;
   isHorizontal: boolean;

@@ -36,7 +36,11 @@ import { exportToJSON } from './utils/exportFiles';
 let swUpdatedBeforeRender = false;
 eventBus.on('sw-update', () => (swUpdatedBeforeRender = true));
 
-export const App = (): JSX.Element => {
+interface AppProps {
+  contained?: boolean;
+}
+
+export const App = (props?: AppProps): JSX.Element => {
   /**
    * Those next three lines are useful to display a popup
    * if the client code has been updated. This trigger a signal
@@ -112,8 +116,13 @@ export const App = (): JSX.Element => {
     }
   });
 
+  let container: HTMLElement | undefined;
+  const assignContainer = (ref: HTMLElement) => {
+    props?.contained && (container = ref);
+  };
+
   return (
-    <div class="relative flex bg-solid-medium h-screen overflow-hidden text-slate-900 dark:text-slate-50 font-sans flex-col">
+    <div ref={assignContainer} class={`relative flex bg-solid-medium ${props?.contained ? 'h-full' : 'h-screen'} overflow-hidden text-slate-900 dark:text-slate-50 font-sans flex-col`}>
       <Show
         when={header}
         children={
@@ -144,6 +153,7 @@ export const App = (): JSX.Element => {
       />
 
       <Repl
+        container={container}
         compiler={compiler}
         formatter={formatter}
         isHorizontal={isHorizontal}
