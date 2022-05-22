@@ -1,7 +1,7 @@
 import { render } from 'solid-js/web';
-import { App } from './app';
+import { AppWithDevtools } from './appWithDevtools';
 import { registerServiceWorker } from './utils/serviceWorker';
 
-render(App, document.querySelector('#app')!);
+render(AppWithDevtools, document.querySelector('#app')!);
 
 registerServiceWorker();
