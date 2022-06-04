@@ -56,6 +56,7 @@
     "@amoutonbrady/lz-string": "^0.0.1",
     "@babel/preset-typescript": "^7.17.12",
     "@babel/standalone": "^7.17.12",
+    "babel-plugin-jsx-dom-expressions": "^0.33.7",
     "babel-preset-solid": "1.4.0",
     "dedent": "^0.7.0",
     "jszip": "^3.9.1",
