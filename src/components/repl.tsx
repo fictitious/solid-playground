@@ -488,6 +488,7 @@ export const Repl: typeof ReplProps = (props) => {
             devtools={devtoolsOpen()}
             isDark={props.dark}
             code={store.compiled}
+            extraHeadContent={props.previewExtraHeadContent}
             class={`h-full w-full bg-white row-start-5 ${
               props.isHorizontal ? '' : 'md:row-start-2'
             }`}

@@ -9,6 +9,7 @@ export const Preview: Component<Props> = (props) => {
     'class',
     'reloadSignal',
     'devtools',
+    'extraHeadContent'
   ]);
 
   let iframe!: HTMLIFrameElement;
@@ -165,6 +166,7 @@ export const Preview: Component<Props> = (props) => {
             }
           })
         </script>
+        ${internal.extraHeadContent ?? ''}
       </head>
       
       <body class="dark">
@@ -224,4 +226,5 @@ type Props = JSX.HTMLAttributes<HTMLDivElement> & {
   reloadSignal: boolean;
   devtools: boolean;
   isDark: boolean;
+  extraHeadContent?: string;
 };

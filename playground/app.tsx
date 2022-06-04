@@ -38,6 +38,7 @@ eventBus.on('sw-update', () => (swUpdatedBeforeRender = true));
 
 interface AppProps {
   contained?: boolean;
+  previewExtraHeadContent?: string;
 }
 
 export const App = (props?: AppProps): JSX.Element => {
@@ -166,6 +167,7 @@ export const App = (props?: AppProps): JSX.Element => {
         setCurrent={setCurrent}
         version={version()}
         id="repl"
+        previewExtraHeadContent={props?.previewExtraHeadContent}
         onEditorReady={(_editor) => {
           editor = _editor;
         }}
